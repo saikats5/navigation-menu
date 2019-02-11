@@ -1,0 +1,320 @@
+<div class="wrapper">
+  <nav class="greedy-menu">
+    <button class="toggle-links"></button>
+    <ul>
+      <li><a href="#">This</a></li>
+      <li><a href="#">is</a></li>
+      <li><a href="#">the</a></li>
+      <li><a href="#">pure</a></li>
+      <li><a href="#">JavaScript</a></li>
+      <li><a href="#">Version</a></li>
+      <li><a href="#">of</a></li>
+      <li><a href="#">Greedy</a></li>
+      <li><a href="#">Nav</a></li>
+      <li><a href="#">It is</a></li>
+      <li><a href="#">Pretty neat</a></li>
+      <li><a href="#">I think</a></li>
+      <li><a href="#">It can</a></li>
+      <li><a href="#">Handle</a></li>
+      <li><a href="#">Many links</a></li>
+    </ul>
+  </nav>
+  <div class="description">
+    <p>The pure JavaScript (well, more like DOM API ^_^) version of Luke Jackson's <a href="https://codepen.io/lukejacksonn/pen/PwmwWV" target="_blank">Greedy Navigation</a>.</p>
+    <p>Resize the window :)</p>
+    <p>Fork it on <a href="https://github.com/tiberiualex/Greedy-Pure" target="_blank">Github</a>.</p>
+  </div>
+</div>
+
+/* Menu settings */
+$bg-color: #fff;
+$text-color: #78b1eb;
+$text-size: 18px;
+
+/* The main container */
+.greedy-menu {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  min-width: 240px;
+  background-color: #fff;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: $text-size;
+  line-height: 1;
+
+  /* Style resets */
+  * {
+    box-sizing: border-box;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    /* The visible links list */
+    &:first-of-type {
+      position: relative;
+      display: flex;
+
+      /* Displaying the menu items on the same line */
+      li {
+        
+      }
+    }
+  }
+
+  /* The links */
+  a {
+    display: block;
+    padding: 18px 25px;
+    color: $text-color;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .visible-links > li:not(:last-child) > a {
+    border-right: 1px solid $text-color;
+  }
+
+  /* The hidden links list */
+  .hidden-links {
+    position: absolute;
+    top: 54px;
+    right: 0;
+    background-color: #fff;
+    transform: none;
+    transform-origin: 0 0;
+    transition: transform .3s cubic-bezier(0.77, 0, 0.175, 1);
+
+    &.links-invisible {
+      transform: scaleY(0);
+
+      li {
+        opacity: 0;
+
+        a {
+          color: #fff;
+        }
+      }
+    }
+
+    li {
+      display: block;
+      opacity: 1;
+      transition: opacity 0.25s ease 0.15s, color 0.15s;
+
+      &:not(:last-child) > a {
+        border-bottom: 1px solid $text-color;
+      }
+    }
+  }
+
+  /* The button which hides/shows links */
+  .toggle-links {
+    align-self: flex-end;
+    position: relative;
+    flex: 0 0 60px;
+    order: 2;
+    visibility: hidden;
+    top: 0;
+    right: 0;
+    border: none;
+    width: 60px;
+    height: $text-size + 36px;
+    background-color: darken(saturate($text-color, 25%), 6%);
+    font-size: $text-size;
+    line-height: 1;
+    color: $text-color;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken(saturate($text-color, 25%), 8%);
+
+      &::before {
+        transform: scale(1.05);
+      }
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &.visible {
+      visibility: visible;
+    }
+
+    /* Firefox specific style reset */
+    &::-moz-focus-inner {
+      padding: 0;
+      border: 0
+    }
+
+    /*  The hamburger icon */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 17px;
+      left: 12px;
+      display: block;
+      width: 36px;
+      height: 4px;
+      background-color: $bg-color;
+      box-shadow: 0 8px 0 $bg-color,
+                  0 16px 0 $bg-color;
+      transition: transform .3s cubic-bezier(0.77, 0, 0.175, 1),
+                  box-shadow .2s ease .1s;
+    }
+
+    /* The circle icon */
+    &.counter::before {
+      box-sizing: border-box;
+      content: attr(data-count);
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      left: -17px;
+      display: block;
+      color: $bg-color;
+      font-size: 16px;
+      width: 34px;
+      padding: 6px 1px;
+      background-color: darken(saturate($text-color, 20%), 7%);
+      border: 3px solid $bg-color;
+      border-radius: 50%;
+      line-height: 1;
+      text-align: center;
+    }
+  }
+}
+
+/* Page styles */
+body {
+  background-color: $text-color;
+}
+
+.wrapper {
+  padding: 20px;
+}
+
+.description {
+  margin-top: 40px;
+  font-family: Helvetica;
+  color: #fff;
+  
+  a {
+    color: #fff;
+  }
+}
+
+
+;(function() {
+  'use strict';
+
+  var Greedy = function Greedy(options) {
+    this.element = document.querySelector(options.element);
+    this.counter = options.counter || false;
+    this.visibleLinks = this.element.querySelector('ul');
+    this.toggleButton = this.element.querySelector('.toggle-links');
+    this.breakpoints = [];
+    this.init();
+  };
+
+  window.Greedy = Greedy;
+
+  Greedy.prototype.init = function() {
+    this.setupMenu();
+    this.calculateBreakpoints();
+    this.updateMenu();
+    this.addBindings();
+  };
+
+  /*
+    Creates/returns a method bounded with 'this'. Used for creating
+    named event listeners that can easily be removed
+  */
+  Greedy.prototype.bindMethod = function(name) {
+    return this['_' + name + '_'] || Object.defineProperty(
+      this, '_' + name + '_', {value: this[name].bind(this)}
+    )['_' + name + '_'];
+  };
+
+  /*
+    Creates the necessary markup and adds the necessary classes
+  */
+  Greedy.prototype.setupMenu = function() {
+    this.hiddenLinks = document.createElement('ul');
+    this.hiddenLinks.classList.add('hidden-links');
+    this.hiddenLinks.classList.add('links-invisible');
+    this.element.appendChild(this.hiddenLinks);
+    this.visibleLinks.classList.add('visible-links');
+
+    if (this.counter) {
+      this.toggleButton.classList.add('counter');
+    } else {
+      this.toggleButton.classList.add('no-counter');
+    }
+  };
+
+  /*
+    For each navigation item, calculate how much space is needed
+    to accomodate it
+  */
+  Greedy.prototype.calculateBreakpoints = function() {
+    var childrenWidth = 0;
+
+    for (var i = 0; i < this.visibleLinks.children.length; i++) {
+      childrenWidth += this.visibleLinks.children[i].offsetWidth;
+      this.breakpoints[i] = childrenWidth;
+    }
+  };
+
+  Greedy.prototype.addBindings = function() {
+    window.addEventListener('resize', this.bindMethod('updateMenu'));
+    this.toggleButton.addEventListener('click', this.bindMethod('toggleHiddenLinks'));
+  };
+
+  Greedy.prototype.updateMenu = function() {
+    var availableSpace = this.element.offsetWidth - this.toggleButton.offsetWidth;
+    var itemsVisible = this.visibleLinks.children.length;
+    var requiredSpace = this.breakpoints[itemsVisible - 1];
+
+    /*
+      Check if there is not enough space for the visible links or
+      if there is space available for the hidden link
+    */
+    if (availableSpace < this.breakpoints[itemsVisible - 1]) {
+      this.toggleButton.classList.add('visible');
+
+      while (availableSpace < this.breakpoints[itemsVisible - 1]) {
+        this.hiddenLinks.insertBefore(this.visibleLinks.children[itemsVisible - 1], this.hiddenLinks.firstChild);
+        itemsVisible--;
+      }
+    } else if (availableSpace > this.breakpoints[itemsVisible]) {
+      while (availableSpace > this.breakpoints[itemsVisible]) {
+        this.visibleLinks.appendChild(this.hiddenLinks.removeChild(this.hiddenLinks.firstChild));
+        itemsVisible++;
+      }
+    }
+
+    if (this.counter) {
+      this.toggleButton.setAttribute('data-count', this.hiddenLinks.children.length);
+      if (!this.hiddenLinks.children.length) {
+        this.toggleButton.classList.remove('visible');
+      }
+    }
+  };
+
+  Greedy.prototype.toggleHiddenLinks = function() {
+    this.hiddenLinks.classList.toggle('links-invisible');
+    this.toggleButton.classList.toggle('links-displayed');
+  };
+})();
+
+// Initialise menu
+document.addEventListener('DOMContentLoaded', function(event) {
+    var menu = new Greedy({
+                          element: '.greedy-menu',
+                          counter: true
+                         });
+  });
