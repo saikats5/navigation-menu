@@ -1,0 +1,108 @@
+<div class="bar">
+    <h3 class="title">Heading here</h3>
+    <div class="wrap">
+        <ul id='main-2'>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Clients</a></li>
+            <li><a href="#">Rockets</a></li>
+            <li><a href="#">Bugs</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li class="more-2 hidden" data-width="80">
+                <a href="#">More</a>
+                <ul></ul>
+            </li>
+        </ul>
+    </div>
+			</div>
+
+
+            .bar {
+  background: rgba(255,0,0,.20);
+  margin: 0 auto;
+  width: 100%;
+  max-width: 80%;
+	
+	.title {
+    background: rgba(255,0,0,.20);
+    float: left;
+    padding: 0 12px;
+	}
+	
+	.wrap {
+		background: rgba(255,0,0,.20);
+		overflow: hidden;
+		
+		> ul {
+			background: rgba(255,0,0,.20);
+			float: left;
+      padding: 0;
+		}
+		
+		> ul > li {
+			display: block;
+			float: left;
+			padding-left: 0;
+			position: relative;
+		
+			&.hidden {
+				display: none;
+			}
+		}	
+    
+		a {
+			display: block;
+			padding: 4px 12px;
+		}
+			
+		ul ul {
+			background: #f00;
+			display: none;
+			position: absolute;
+			top: 100%;
+			right: 0;
+			margin-right: 0;
+			z-index: 100;
+			
+			a {
+				white-space: nowrap;
+			}
+		}
+			
+		ul li:hover ul {    
+			display: block;
+		}
+	}
+}
+
+
+function calcWidth() {
+  var navwidth = 0;
+  var morewidth = $('#main-2 .more-2').outerWidth(true);
+  $('#main-2 > li:not(.more-2)').each(function() {
+      navwidth += $(this).outerWidth( true );
+  });
+  var availablespace = $('.wrap').outerWidth(true) - morewidth;
+  
+  if (navwidth > availablespace) {
+    var lastItem = $('#main-2 > li:not(.more-2)').last();
+    lastItem.attr('data-width', lastItem.outerWidth(true));
+    lastItem.prependTo($('#main-2 .more-2 ul'));
+    calcWidth();
+  } else {
+    var firstMoreElement = $('#main-2 li.more-2 li').first();
+    if (navwidth + firstMoreElement.data('width') < availablespace) {
+      firstMoreElement.insertBefore($('#main-2 .more-2'));
+    }
+  }
+  
+  if ($('.more-2 li').length > 0) {
+    $('.more-2').css('display','block');
+  } else {
+    $('.more-2').css('display','none');
+  }
+}
+$(window).on('resize load',function(){
+  calcWidth();
+});
